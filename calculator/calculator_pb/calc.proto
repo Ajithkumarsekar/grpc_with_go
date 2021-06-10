@@ -24,8 +24,18 @@ message DecomposedNumbersResponse{
   int64 primeFactor = 1;
 }
 
+message ComputeAverageRequest{
+  int64 num = 1;
+}
+
+message ComputeAverageResponse{
+  double result = 1;
+}
+
 service CalculatorService{
   rpc SumNums(SumRequest) returns (SumResponse){};
 
   rpc DecomposeToPrimes(DecomposeNumberRequest) returns (stream DecomposedNumbersResponse){};
+
+  rpc ComputeAverage(stream ComputeAverageRequest) returns (ComputeAverageResponse){};
 }

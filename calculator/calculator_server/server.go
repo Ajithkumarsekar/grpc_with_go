@@ -5,11 +5,40 @@ import (
 	"fmt"
 	"github.com/ajithkumarsekar/grpc_go_course/calculator/calculator_pb"
 	"google.golang.org/grpc"
+	"io"
 	"log"
 	"net"
 )
 
 type server struct{}
+
+func (s server) ComputeAverage(streamRequest calculator_pb.CalculatorService_ComputeAverageServer) error {
+	fmt.Printf("Received ComputeAverage RPC\n")
+
+	sum := int64(0)
+	n := 0
+
+	for {
+		num, err := streamRequest.Recv()
+		if err == io.EOF {
+			result := float64(sum) / float64(n)
+			return streamRequest.SendAndClose(
+				&calculator_pb.ComputeAverageResponse{
+					Result: result,
+				},
+			)
+		}
+		if err != nil {
+			log.Fatalf("Error occured while receiving nums %v", err)
+		}
+
+		sum += num.GetNum()
+		n++
+
+	}
+
+	return nil
+}
 
 func (s server) DecomposeToPrimes(request *calculator_pb.DecomposeNumberRequest, stream calculator_pb.CalculatorService_DecomposeToPrimesServer) error {
 	fmt.Printf("Received PrimeNumberDecomposition RPC: %v\n", request)

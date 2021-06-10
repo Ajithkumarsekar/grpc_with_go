@@ -26,9 +26,38 @@ func main() {
 
 	c := calculator_pb.NewCalculatorServiceClient(cc)
 
-	doUnary(c)
+	//doUnary(c)
 
-	doServerStreaming(c)
+	//doServerStreaming(c)
+
+	doClientStreaming(c)
+}
+
+func doClientStreaming(c calculator_pb.CalculatorServiceClient) {
+	fmt.Println("Starting to do a ComputeAverage Client Streaming RPC...")
+	stream, err := c.ComputeAverage(context.Background())
+	if err != nil {
+		log.Fatalf("Error while opening stream: %v\n", err)
+	}
+
+	allNums := []int64{2, 4, 6, 9, 12, 2014}
+
+	for _, num := range allNums {
+		fmt.Printf("Sending number: %v\n", num)
+		err := stream.Send(&calculator_pb.ComputeAverageRequest{
+			Num: num,
+		})
+		if err != nil {
+			log.Fatalf("Error while sending nums %v", err)
+		}
+	}
+
+	result, err := stream.CloseAndRecv()
+	if err != nil {
+		log.Fatalf("Error while receiving response: %v", err)
+	}
+	fmt.Printf("The Average is: %v\n", result.GetResult())
+
 }
 
 func doServerStreaming(c calculator_pb.CalculatorServiceClient) {
@@ -42,7 +71,7 @@ func doServerStreaming(c calculator_pb.CalculatorServiceClient) {
 	for {
 		resultStream, err := stream.Recv()
 		if err == io.EOF {
-			fmt.Printf("reached the stream end. Stopping it...")
+			fmt.Printf("reached the stream end. Stopping it...\n")
 			break
 		}
 		if err != nil {
