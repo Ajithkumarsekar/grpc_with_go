@@ -16,6 +16,16 @@ message SumResponse{
   int64 result = 1;
 }
 
+message DecomposeNumberRequest{
+  int64 num = 1;
+}
+
+message DecomposedNumbersResponse{
+  int64 primeFactor = 1;
+}
+
 service CalculatorService{
   rpc SumNums(SumRequest) returns (SumResponse){};
+
+  rpc DecomposeToPrimes(DecomposeNumberRequest) returns (stream DecomposedNumbersResponse){};
 }
