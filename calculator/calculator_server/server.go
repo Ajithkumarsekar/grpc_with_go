@@ -12,6 +12,34 @@ import (
 
 type server struct{}
 
+func (s server) FindMaximum(streamRequest calculator_pb.CalculatorService_FindMaximumServer) error {
+	fmt.Println("Received FindMaximum RPC")
+	maxNum := int64(0)
+
+	for {
+		recv, err := streamRequest.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			log.Fatalf("Error while reading client stream: %v", err)
+			return err
+		}
+		fmt.Printf("Received a new num : %v\n", recv.GetNum())
+		if recv.GetNum() > maxNum {
+			maxNum = recv.GetNum()
+			err := streamRequest.SendMsg(&calculator_pb.FindMaximumResponse{
+				MaxNum: maxNum,
+			})
+			if err != nil {
+				log.Fatalf("Error occured while sending maxNum : %v", err)
+				return err
+			}
+		}
+	}
+
+}
+
 func (s server) ComputeAverage(streamRequest calculator_pb.CalculatorService_ComputeAverageServer) error {
 	fmt.Printf("Received ComputeAverage RPC\n")
 

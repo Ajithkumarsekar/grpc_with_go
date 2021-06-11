@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc"
 	"io"
 	"log"
+	"time"
 )
 
 func main() {
@@ -30,7 +31,58 @@ func main() {
 
 	//doServerStreaming(c)
 
-	doClientStreaming(c)
+	//doClientStreaming(c)
+
+	doBiDiStreaming(c)
+}
+
+func doBiDiStreaming(c calculator_pb.CalculatorServiceClient) {
+	fmt.Println("Starting to do a doBiDiStreaming RPC...")
+	biStream, err := c.FindMaximum(context.Background())
+	if err != nil {
+		log.Fatalf("Error while opening stream: %v\n", err)
+	}
+
+	allNums := []int64{1, 3, 12, 5, 19, 21}
+
+	waitc := make(chan struct{})
+
+	// send go routine
+	go func() {
+		for _, num := range allNums {
+			fmt.Printf("Sending num : %v\n", num)
+			err := biStream.SendMsg(&calculator_pb.FindMaximumRequest{
+				Num: num,
+			})
+			if err != nil {
+				log.Fatalf("Error while sending num %v : %v\n", num, err)
+			}
+			time.Sleep(1000 * time.Millisecond)
+		}
+		err := biStream.CloseSend()
+		if err != nil {
+			log.Fatalf("Error occured while closing the stream : %v", err)
+			return
+		}
+	}()
+
+	// receive go routine
+	go func() {
+		for {
+			recv, err := biStream.Recv()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				log.Fatalf("Problem while reading server stream: %v\n", err)
+				break
+			}
+			fmt.Printf("Maximum num so far : %v\n", recv.GetMaxNum())
+		}
+		close(waitc)
+	}()
+
+	<-waitc
 }
 
 func doClientStreaming(c calculator_pb.CalculatorServiceClient) {
