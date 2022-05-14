@@ -9,12 +9,13 @@ import (
 
 	"github.com/ajithkumarsekar/grpc_with_go/calculator/calculator_pb"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
 	fmt.Println("Hello from calculator client")
 
-	cc, err := grpc.Dial("localhost:9001", grpc.WithInsecure())
+	cc, err := grpc.Dial("localhost:9001", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("could not connect %v", err)
 	}
