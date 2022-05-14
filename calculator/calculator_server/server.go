@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/ajithkumarsekar/grpc_go_course/calculator/calculator_pb"
-	"google.golang.org/grpc"
 	"io"
 	"log"
 	"net"
+
+	"github.com/ajithkumarsekar/grpc_with_go/calculator/calculator_pb"
+	"google.golang.org/grpc"
 )
 
 type server struct{}
