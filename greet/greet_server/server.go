@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
+	"time"
 
 	"github.com/ajithkumarsekar/grpc_with_go/greet/greetpb"
 	"google.golang.org/grpc"
@@ -12,10 +14,25 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-type server struct{}
+type server struct {
+	greetpb.UnimplementedGreetServiceServer
+}
+
+func (s *server) GreetWithDeadline(ctx context.Context, request *greetpb.GreetRequest) (*greetpb.GreetResponse, error) {
+	log.Printf("%v\nGreetWithDeadline method is invoked : %v\n", strings.Repeat("=", 30), request)
+	select {
+	case <-time.After(time.Second * 2):
+		log.Printf("wait time is done")
+	case <-ctx.Done():
+		log.Printf("context deadline exceeded by server")
+		return nil, fmt.Errorf("context deadline exceeded by server")
+	}
+
+	return &greetpb.GreetResponse{Result: fmt.Sprintf("Hello %v %v!", request.Greeting.FirstName, request.Greeting.LastName)}, nil
+}
 
 func (s *server) Greet(ctx context.Context, request *greetpb.GreetRequest) (*greetpb.GreetResponse, error) {
-	log.Printf("Greet method is invoked : %v\n", request)
+	log.Printf("%v\nGreetWithDeadline method is invoked : %v\n", strings.Repeat("=", 30), request)
 
 	log.Printf("Checking for metadata")
 	md, ok := metadata.FromIncomingContext(ctx)

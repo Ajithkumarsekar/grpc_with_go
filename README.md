@@ -20,6 +20,8 @@ yes, using gRPC reflections. gRPC Server Reflection provides information about p
 ![evans_client](/screenshots/evans_client.png)
 
 # Reference
+- [gRPC getting started with Go](https://grpc.io/docs/languages/go/quickstart)
 - [gRPC core concepts](https://grpc.io/docs/what-is-grpc/core-concepts/)
 - [gRPC metadata](https://github.com/grpc/grpc-go/blob/master/Documentation/grpc-metadata.md)
 - [gRPC server reflection protocol](https://github.com/grpc/grpc/blob/master/doc/server-reflection.md)
+- [Deadlines](https://grpc.io/blog/deadlines/)

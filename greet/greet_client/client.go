@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
+	"time"
 
 	"github.com/ajithkumarsekar/grpc_with_go/greet/greetpb"
 	"google.golang.org/grpc"
@@ -21,8 +21,31 @@ func main() {
 	defer cc.Close()
 
 	c := greetpb.NewGreetServiceClient(cc)
-	fmt.Printf("created a client %v\n", c)
 
+	//greet(c)
+	greetWithDeadline(c)
+}
+
+func greetWithDeadline(c greetpb.GreetServiceClient) {
+	clientDeadLine := time.Now().Add(time.Second * 1)
+	ctx, cancel := context.WithDeadline(context.Background(), clientDeadLine)
+	defer cancel()
+
+	// GreetWithDeadline is just a function name. it has nothing to
+	// do with deadline handling
+	resp, err := c.GreetWithDeadline(ctx, &greetpb.GreetRequest{
+		Greeting: &greetpb.Greeting{
+			FirstName: "Ajithkumar",
+			LastName:  "sekar",
+		},
+	})
+	if err != nil {
+		log.Fatalf("error while calling GreetWithDeadline RPC : %v", err)
+	}
+	log.Printf("GreetWithDeadline response `%v`\n", resp.Result)
+}
+
+func greet(c greetpb.GreetServiceClient) {
 	req := &greetpb.GreetRequest{
 		Greeting: &greetpb.Greeting{
 			FirstName: "Ajithkumar",
@@ -57,5 +80,4 @@ func main() {
 	}
 
 	log.Printf("Greet response `%v`\n", greet.Result)
-
 }
