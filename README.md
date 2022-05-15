@@ -22,3 +22,4 @@ yes, using gRPC reflections. gRPC Server Reflection provides information about p
 # Reference
 - [gRPC core concepts](https://grpc.io/docs/what-is-grpc/core-concepts/)
 - [gRPC metadata](https://github.com/grpc/grpc-go/blob/master/Documentation/grpc-metadata.md)
+- [gRPC server reflection protocol](https://github.com/grpc/grpc/blob/master/doc/server-reflection.md)
