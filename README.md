@@ -11,6 +11,17 @@ Developed by google (2015). It uses `HTTP/2` for transport, `Protocol Buffers` a
 ### what is interface description language?
 IDL is a generic term for a language that lets a program or object written in one language communicate with another program written in an unknown language. IDLs describe an interface in a language-independent way, enabling communication between software components that do not share one language, for example, between those written in C++ and those written in Java.
 Popular IDL used with gRPC `Apache Thrift` (by Facebook), `Apache Avro`, `Flatbuffers` (by Google)
+### Why do you mean by `HTTP/2` for transport? gRPC doesn't have any components of HTTP like url, method, headers so HTTP?
+That's not entirely true. gRPC use HTTP components like URL path, request/response headers (content-type, timeout, custom-metadata) behind the scenes to make the rpc call!
+Most importantly it uses HTTP 2 streams to make multiple RPC requests within a single TCP connection with support for stream cancellation etc. refer [PROTOCOL-HTTP2](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md).
+### What is channel and subchannels?
+
+### What are all the states of a channel?
+
+### What happens to the channel when the server goes down? Does it reresolve the DNS to obtain new address and retry the rpc?
+
+### Does gRPC server usually sent GO AWAY when it shuts down?
+
 ### Unary RPC flow?
 ![unary_flow](/screenshots/unary_flow.png)
 ### can gRPC method be called without generated stub (client code)?
